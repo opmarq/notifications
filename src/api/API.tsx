@@ -50,7 +50,7 @@ let notifications: INotification[] = [
 		"description": "Tempor sint exercitation nostrud anim laborum exercitation nulla proident dolor tempor proident.",
 		"period": "2014-03-14T01:05:19 -01:00",
 		"creation_date": "Mon Oct 11 2021 11:22:24 GMT+0200 (CEST)",
-		"read": true,
+		"read": false,
 	},
 	{
 		"id": "61767750ecc614208816f542",
@@ -80,7 +80,7 @@ let notifications: INotification[] = [
 		"description": "Fugiat veniam irure reprehenderit in.",
 		"period": "2020-04-25T07:13:27 -02:00",
 		"creation_date": "Mon Oct 14 2021 11:22:24 GMT+0200 (CEST)",
-		"read": true,
+		"read": false,
 	},
 	{
 		"id": "617677503774350a17417a39",
@@ -99,11 +99,14 @@ export const getNotifications = (): Promise<unknown> => {
 	});
 }
 
-export const markNotificationAsRead = (id: string) => {
-	return notifications.map(notification => {
+export const markNotificationAsRead = (id: string): Promise<unknown> => {
+	notifications = notifications.map(notification => {
 		return {
 			...notification,
 			read: id === notification.id ? true : notification.read
 		}
+	})
+	return new Promise(resolve => {
+		resolve(notifications)
 	})
 }

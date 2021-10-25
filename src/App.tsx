@@ -4,25 +4,26 @@ import { Box, Heading, Container } from "@chakra-ui/react";
 import { Card } from './notifications/Card';
 import { getNotifications, INotification, markNotificationAsRead } from "./api/API";
 
-import './App.css';
-
 function App() {
 
   const [notifications, setNotifications] = useState<INotification[]>([])
 
   useEffect(() => {
-    getNotifications().then((notifications: any) => {
+    getNotifications().then((notifications) => {
       setNotifications(notifications as INotification[])
     })
   }, [])
 
   const handleMarkAsRead = (id: string) => {
-    markNotificationAsRead(id)
+    markNotificationAsRead(id).then(notifications => {
+      console.log(notifications);
+      setNotifications(notifications as INotification[])
+    })
   }
 
   return (
     <Box p="1">
-      <Container bgColor="#6c757d" color="white" borderRadius="md" >
+      <Container p="0" bgColor="#6c757d" color="white" borderRadius="md" >
         <Box p="4">
           <Heading size="md">
             Notifications

@@ -14,7 +14,7 @@ export interface CardProps {
 export const Card = ({ image, type, content, description, period, read, markAsRead }: CardProps) => {
 	return <Box _hover={{
 		backgroundColor: "#adb5bd"
-	}} bgColor={read ? "#adb5bd" : 'transparent'} borderTop="1px solid #ced4da" px="4" py="1" cursor="pointer" onMouseEnter={markAsRead} >
+	}} bgColor={!read ? "#adb5bd" : 'transparent'} borderTop="1px solid #ced4da" px="4" py="2" cursor="pointer" onMouseEnter={markAsRead} >
 		<Flex>
 			<Box mr="2">
 				<Avatar

@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Heading, IconButton, Flex, Badge, Text, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, Button, AlertDialogFooter } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { Box, Text, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, Button, AlertDialogFooter } from "@chakra-ui/react";
 
-import { NotificationsItem } from './notifications/NotificationsItem';
-import { NotificationsContainer } from './notifications/NotificationsContainer';
-import { NotificationsHeader } from "./notifications/NotificationsHeader";
+import { NotificationsItem, NotificationsBody, NotificationsHeader, NotificationsContainer } from './notifications';
 import { getNotifications, INotification, markNotificationAsRead, clearNotifications } from "./api/API";
 
 function App() {
@@ -40,7 +37,7 @@ function App() {
         <NotificationsHeader count={notifications.length} label="Notifications" onClear={() => {
           setIsOpen(true)
         }} />
-        <Box maxHeight="600px" overflow="scroll">
+        <NotificationsBody>
           {
             notifications.length > 0 ?
               notifications.sort((a, b) => {
@@ -52,7 +49,7 @@ function App() {
               })
               : <Text textAlign="center" p="4">No notifications 👐</Text>
           }
-        </Box>
+        </NotificationsBody>
       </NotificationsContainer>
       <AlertDialog
         isOpen={isOpen}

@@ -1,6 +1,6 @@
 # Notifications center 📳
 
-## Work in progress
+### Work in progress
 
 1. Infinite scroll 
 2. Style refactor

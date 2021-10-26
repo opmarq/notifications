@@ -1,1 +1,1 @@
-# Notifications 📳
+# Notifications center 📳

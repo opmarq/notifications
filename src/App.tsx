@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Box, Flex, Text, AlertDialog, Spinner, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, Button, AlertDialogFooter } from "@chakra-ui/react";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 
 import { NotificationsItem, NotificationsBody, NotificationsHeader, NotificationsContainer } from './notifications';
 import { getNotifications, INotification, markNotificationAsRead, clearNotifications } from "./api/API";
@@ -10,16 +12,23 @@ function App() {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false);
   const cancelRef = useRef<any>()
+  const page = useRef(1);
 
   const onClose = () => setIsOpen(false)
 
   useEffect(() => {
     setLoading(true)
+    let isCancelled = false;
     getNotifications().then((notifications) => {
-      setNotifications(notifications as INotification[])
-      setLoading(false)
+      if (!isCancelled) {
+        setNotifications(notifications as INotification[])
+        setLoading(false)
+      }
     })
-  }, [])
+    return () => {
+      isCancelled = true;
+    }
+  }, [page])
 
   const handleMarkAsRead = (id: string) => {
     markNotificationAsRead(id).then(notifications => {
@@ -34,23 +43,31 @@ function App() {
     })
   }
 
+  const handleLoadMore = () => {
+    console.log("load more")
+  }
+
   return (
     <Box p="1">
       <NotificationsContainer>
-        <NotificationsHeader count={notifications.length} label="Notifications" onClear={() => {
+        <NotificationsHeader notifications={notifications} label="Notifications" onClear={() => {
           setIsOpen(true)
         }} />
         <NotificationsBody>
+
           {
-            loading ? <Flex justifyContent="center" p="4"> <Spinner /> </Flex> :
+            loading ? <Flex justifyContent="center" p="4"> <Spinner title="loader" /> </Flex> :
               notifications.length > 0 ?
-                notifications.sort((a, b) => {
-                  return new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime();
-                }).map(({ id, image, type, content, description, period, read, title, artist }) => {
-                  return <NotificationsItem key={id} markAsRead={() => {
-                    handleMarkAsRead(id)
-                  }} title={title} artist={artist} read={read} image={image} type={type} content={content} description={description} period={period} />
-                })
+                <InfiniteScroll dataLength={notifications.length} hasMore={loading} next={handleLoadMore} loader={<p>Load more...</p>}>
+                  {notifications.sort((a, b) => {
+                    return new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime();
+                  }).map(({ id, ...rest }) => {
+                    return <NotificationsItem key={id} markAsRead={() => {
+                      handleMarkAsRead(id)
+                    }} {...rest} />
+                  })
+                  }
+                </InfiniteScroll>
                 : <Text textAlign="center" p="4">No notifications 👐</Text>
           }
         </NotificationsBody>

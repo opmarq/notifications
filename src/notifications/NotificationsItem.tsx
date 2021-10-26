@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Avatar, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Avatar, Badge, Flex, Heading, Text } from "@chakra-ui/react";
 import { formatDistance, subDays } from "date-fns";
 
 export interface NotificationsItemProps {
@@ -17,8 +17,8 @@ export interface NotificationsItemProps {
 export const NotificationsItem = ({ image, type, content, description, period, read, markAsRead, title, artist }: NotificationsItemProps) => {
 	return <Box transition="all 1s" _hover={{
 		backgroundColor: "gray.700"
-	}} bgColor={!read ? "gray.900" : 'transparent'} borderTop="1px solid #32323d" px="4" py="2" cursor="pointer" onMouseEnter={markAsRead} >
-		<Flex alignItems="center">
+	}} borderTop="1px solid #32323d" px="4" py="2" cursor="pointer" onMouseEnter={markAsRead} >
+		<Flex alignItems="center" position="relative">
 			<Box mr="4">
 				<Avatar
 					size="lg"
@@ -30,6 +30,9 @@ export const NotificationsItem = ({ image, type, content, description, period, r
 				<Heading size="md">{title}</Heading>
 				<Text>{artist}</Text>
 			</Box>
+			{
+				!read && <Box position="absolute" right="0" top="0" w="10px" h="10px" bgColor="red.800" borderRadius="full" />
+			}
 		</Flex>
 		{
 			description &&

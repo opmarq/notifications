@@ -1,75 +1,120 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Flex, Text, AlertDialog, Spinner, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, Button, AlertDialogFooter } from "@chakra-ui/react";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  Box,
+  Flex,
+  Text,
+  AlertDialog,
+  Spinner,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  Button,
+  AlertDialogFooter,
+} from "@chakra-ui/react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-
-import { NotificationsItem, NotificationsBody, NotificationsHeader, NotificationsContainer } from './notifications';
-import { getNotifications, INotification, markNotificationAsRead, clearNotifications } from "./api/API";
+import {
+  NotificationsItem,
+  NotificationsBody,
+  NotificationsHeader,
+  NotificationsContainer,
+} from "./notifications";
+import {
+  getNotifications,
+  INotification,
+  markNotificationAsRead,
+  clearNotifications,
+} from "./api/API";
 
 function App() {
-
-  const [notifications, setNotifications] = useState<INotification[]>([])
-  const [isOpen, setIsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<INotification[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const cancelRef = useRef<any>()
+  const cancelRef = useRef<any>();
   const page = useRef(1);
 
-  const onClose = () => setIsOpen(false)
+  const onClose = () => setIsOpen(false);
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     let isCancelled = false;
     getNotifications().then((notifications) => {
       if (!isCancelled) {
-        setNotifications(notifications as INotification[])
-        setLoading(false)
+        setNotifications(notifications as INotification[]);
+        setLoading(false);
       }
-    })
+    });
     return () => {
       isCancelled = true;
-    }
-  }, [page])
+    };
+  }, [page]);
 
   const handleMarkAsRead = (id: string) => {
-    markNotificationAsRead(id).then(notifications => {
-      setNotifications(notifications as INotification[])
-    })
-  }
+    markNotificationAsRead(id).then((notifications) => {
+      setNotifications(notifications as INotification[]);
+    });
+  };
 
   const handleClear = () => {
-    onClose()
+    onClose();
     clearNotifications().then((notifications) => {
-      setNotifications(notifications as INotification[])
-    })
-  }
+      setNotifications(notifications as INotification[]);
+    });
+  };
 
   const handleLoadMore = () => {
-    console.log("load more")
-  }
+    console.log("load more");
+  };
+
+  const sortedNotifications = notifications
+    .sort((a, b) => {
+      return (
+        new Date(a.creation_date).getTime() -
+        new Date(b.creation_date).getTime()
+      );
+    })
 
   return (
     <Box p="1">
       <NotificationsContainer>
-        <NotificationsHeader notifications={notifications} label="Notifications" onClear={() => {
-          setIsOpen(true)
-        }} />
+        <NotificationsHeader
+          notifications={notifications}
+          label="Notifications"
+          onClear={() => {
+            setIsOpen(true);
+          }}
+        />
         <NotificationsBody>
-
-          {
-            loading ? <Flex justifyContent="center" p="4"> <Spinner title="loader" /> </Flex> :
-              notifications.length > 0 ?
-                <InfiniteScroll dataLength={notifications.length} hasMore={loading} next={handleLoadMore} loader={<p>Load more...</p>}>
-                  {notifications.sort((a, b) => {
-                    return new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime();
-                  }).map(({ id, ...rest }) => {
-                    return <NotificationsItem key={id} markAsRead={() => {
-                      handleMarkAsRead(id)
-                    }} {...rest} />
-                  })
-                  }
-                </InfiniteScroll>
-                : <Text textAlign="center" p="4">No notifications 👐</Text>
-          }
+          {loading ? (
+            <Flex justifyContent="center" p="4">
+              <Spinner title="loader" />{" "}
+            </Flex>
+          ) : notifications.length > 0 ? (
+            <InfiniteScroll
+              dataLength={notifications.length}
+              hasMore={loading}
+              next={handleLoadMore}
+              loader={<p>Load more...</p>}
+            >
+              {
+                sortedNotifications.map(({ id, ...rest }) => {
+                  return (
+                    <NotificationsItem
+                      key={id}
+                      markAsRead={() => {
+                        handleMarkAsRead(id);
+                      }}
+                      {...rest}
+                    />
+                  );
+                })}
+            </InfiniteScroll>
+          ) : (
+            <Text textAlign="center" p="4">
+              No notifications 👐
+            </Text>
+          )}
         </NotificationsBody>
       </NotificationsContainer>
       <AlertDialog

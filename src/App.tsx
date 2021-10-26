@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Text, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, Button, AlertDialogFooter } from "@chakra-ui/react";
+import { Box, Flex, Text, AlertDialog, Spinner, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, Button, AlertDialogFooter } from "@chakra-ui/react";
 
 import { NotificationsItem, NotificationsBody, NotificationsHeader, NotificationsContainer } from './notifications';
 import { getNotifications, INotification, markNotificationAsRead, clearNotifications } from "./api/API";
@@ -8,13 +8,16 @@ function App() {
 
   const [notifications, setNotifications] = useState<INotification[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [loading, setLoading] = useState(false);
   const cancelRef = useRef<any>()
 
   const onClose = () => setIsOpen(false)
 
   useEffect(() => {
+    setLoading(true)
     getNotifications().then((notifications) => {
       setNotifications(notifications as INotification[])
+      setLoading(false)
     })
   }, [])
 
@@ -39,15 +42,16 @@ function App() {
         }} />
         <NotificationsBody>
           {
-            notifications.length > 0 ?
-              notifications.sort((a, b) => {
-                return new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime();
-              }).map(({ id, image, type, content, description, period, read, title, artist }) => {
-                return <NotificationsItem key={id} markAsRead={() => {
-                  handleMarkAsRead(id)
-                }} title={title} artist={artist} read={read} image={image} type={type} content={content} description={description} period={period} />
-              })
-              : <Text textAlign="center" p="4">No notifications 👐</Text>
+            loading ? <Flex justifyContent="center" p="4"> <Spinner /> </Flex> :
+              notifications.length > 0 ?
+                notifications.sort((a, b) => {
+                  return new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime();
+                }).map(({ id, image, type, content, description, period, read, title, artist }) => {
+                  return <NotificationsItem key={id} markAsRead={() => {
+                    handleMarkAsRead(id)
+                  }} title={title} artist={artist} read={read} image={image} type={type} content={content} description={description} period={period} />
+                })
+                : <Text textAlign="center" p="4">No notifications 👐</Text>
           }
         </NotificationsBody>
       </NotificationsContainer>

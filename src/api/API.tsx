@@ -113,7 +113,9 @@ let notifications: INotification[] = [
 ]
 export const getNotifications = (): Promise<unknown> => {
 	return new Promise((resolve) => {
-		resolve(notifications)
+		setTimeout(() => {
+			resolve(notifications)
+		}, 1000);
 	});
 }
 
